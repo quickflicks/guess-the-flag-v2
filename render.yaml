@@ -1,0 +1,13 @@
+# Render blueprint — auto-configures the web service when this repo is connected.
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: flagquest
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/config
+    envVars:
+      - key: NODE_ENV
+        value: production

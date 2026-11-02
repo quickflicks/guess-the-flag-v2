@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="FlagQuest — guess the flag of countries around the world. Pick difficulty and continent, build streaks, climb the leaderboard." />
+  <title>FlagQuest — Guess the Flag</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚩</text></svg>" />
+  <link rel="preconnect" href="https://flagcdn.com" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <script defer src="/js/app.js"></script>
+</head>
+<body>
+  <div class="bg-decor" aria-hidden="true">
+    <span class="orb orb-a"></span><span class="orb orb-b"></span><span class="orb orb-c"></span>
+  </div>
+
+  <header class="topbar">
+    <button class="logo" id="btn-home" title="Back to home">
+      <span class="logo-flag">🚩</span><span class="logo-text">Flag<em>Quest</em></span>
+    </button>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="btn-leaderboard" title="Leaderboard" aria-label="Leaderboard">🏆</button>
+      <button class="icon-btn" id="btn-sound" title="Sound on/off" aria-label="Toggle sound">🔊</button>
+    </div>
+  </header>
+
+  <main id="app">
+    <!-- ============ HOME ============ -->
+    <section class="screen" id="screen-home">
+      <div class="hero">
+        <h1>Guess the <span class="grad">Flag</span></h1>
+        <p class="tagline">197 flags · 4 difficulties · 6 continents · 3 game styles — how deep does your geography go?</p>
+        <div class="daily-row">
+          <button class="btn ghost" id="btn-daily">🗓️ Daily Challenge</button>
+          <span class="daily-note" id="daily-note"></span>
+        </div>
+      </div>
+
+      <div class="setup-card">
+        <div class="field-row">
+          <div class="field">
+            <div class="field-head"><span class="field-title">① Difficulty</span><span class="field-hint">or press <kbd>1</kbd>–<kbd>4</kbd></span></div>
+            <div class="grid-cards" id="difficulty-grid" role="radiogroup" aria-label="Difficulty"></div>
+          </div>
+        </div>
+
+        <div class="field" id="field-region">
+          <div class="field-head"><span class="field-title">② Region</span><span class="field-hint">who do you know best?</span></div>
+          <div class="chips" id="region-grid" role="radiogroup" aria-label="Region"></div>
+        </div>
+
+        <div class="field">
+          <div class="field-head"><span class="field-title">③ Game mode</span></div>
+          <div class="grid-cards cols-2" id="mode-grid" aria-label="Game mode"></div>
+        </div>
+
+        <div class="field">
+          <div class="field-head"><span class="field-title">④ Game style</span></div>
+          <div class="grid-cards cols-3" id="style-grid" aria-label="Game style"></div>
+        </div>
+
+        <div class="field">
+          <div class="field-head"><span class="field-title">⑤ Rounds</span></div>
+          <div class="segmented" id="length-grid" role="radiogroup" aria-label="Number of rounds"></div>
+        </div>
+
+        <div class="field">
+          <div class="field-head"><span class="field-title">⑥ Your name</span><span class="field-hint">optional — for the leaderboard</span></div>
+          <div class="name-row">
+            <input type="text" id="player-name" maxlength="20" placeholder="Anonymous" autocomplete="off" spellcheck="false" />
+            <button class="btn primary big" id="btn-start">▶ Start game</button>
+          </div>
+        </div>
+        <div class="field party-entry">
+          <div class="field-head"><span class="field-title">👥 Party</span><span class="field-hint">play together, live scores</span></div>
+          <div class="name-row party-row">
+            <button class="btn ghost big" id="btn-create-room">🏁 Create room</button>
+            <button class="btn ghost big" id="btn-join-room">🚪 Join with code</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="home-stats" id="home-stats"></div>
+    </section>
+
+    <!-- ============ GAME ============ -->
+    <section class="screen" id="screen-game" hidden>
+      <div class="hud">
+        <div class="hud-left">
+          <span class="chip small" id="hud-diff"></span>
+          <span class="chip small ghost" id="hud-region"></span>
+        </div>
+        <div class="hud-mid">
+          <div class="progress-outer"><div class="progress-inner" id="progress-bar"></div></div>
+          <div class="hud-q" id="hud-question"></div>
+        </div>
+        <div class="hud-right">
+          <div class="bank-pill" id="hud-bank" hidden title="Time bank">⏱️ 60</div>
+          <div class="lives-pill" id="hud-lives" hidden title="Lives">❤️❤️❤️</div>
+          <div class="score-pill" id="hud-score" title="Score">0</div>
+          <div class="streak-pill" id="hud-streak" title="Streak">–</div>
+        </div>
+      </div>
+
+      <div class="party-strip" id="party-strip" hidden>
+        <div class="party-player" data-player-template></div>
+      </div>
+
+      <div class="timer-line"><div class="timer-fill" id="timer-fill"></div></div>
+
+      <div class="q-card" id="q-card">
+        <div class="flag-stage" id="flag-stage"></div>
+        <div class="options" id="options"></div>
+        <div class="type-area" id="type-area" hidden>
+          <input type="text" id="type-input" maxlength="40" placeholder="Type the country name…" autocomplete="off" spellcheck="false" />
+          <button class="btn primary" id="type-submit">Submit</button>
+        </div>
+        <div class="q-actions" id="q-actions">
+          <button class="btn ghost" id="btn-hint">💡 <span id="hint-label">50/50</span> <span class="hint-dot" id="hint-count"></span></button>
+          <button class="btn ghost" id="btn-skip">⏭ Skip <span class="key-hint">S</span></button>
+        </div>
+      </div>
+
+      <div class="reveal-card" id="reveal-card" hidden>
+        <div class="reveal-banner" id="reveal-banner"></div>
+        <div class="facts" id="facts"></div>
+        <button class="btn primary big" id="btn-next">Next ➜ <span class="key-hint">Enter</span></button>
+        <div class="waiting-note" id="waiting-note" hidden>⏳ Waiting for the others…</div>
+      </div>
+    </section>
+
+    <!-- ============ PARTY MENU ============ -->
+    <section class="screen" id="screen-party" hidden>
+      <button class="btn ghost back-btn" id="btn-party-back">← Home</button>
+      <div class="party-menu">
+        <div class="setup-card party-card">
+          <h2>👥 Play with friends</h2>
+          <p class="party-sub">Everyone gets the same questions. Live scoreboard. First to finish isn't always first — accuracy counts.</p>
+          <div class="field">
+            <div class="field-head"><span class="field-title">Your name</span></div>
+            <input type="text" id="party-name" class="text-input" maxlength="20" placeholder="Anonymous" autocomplete="off" spellcheck="false" />
+          </div>
+          <div class="field">
+            <div class="field-head"><span class="field-title">Create a room</span><span class="field-hint">you set the rules</span></div>
+            <div class="party-config">
+              <select id="party-difficulty" class="text-input"></select>
+              <select id="party-region" class="text-input"></select>
+              <select id="party-mode" class="text-input"></select>
+              <select id="party-length" class="text-input">
+                <option value="5">5 rounds</option>
+                <option value="10" selected>10 rounds</option>
+                <option value="15">15 rounds</option>
+              </select>
+            </div>
+            <button class="btn primary big wide" id="btn-party-create">🏁 Create room</button>
+          </div>
+          <div class="field join-field">
+            <div class="field-head"><span class="field-title">Have an invite code?</span></div>
+            <div class="name-row">
+              <input type="text" id="party-code" class="text-input code-input" maxlength="6" placeholder="ABC123" autocomplete="off" spellcheck="false" style="text-transform: uppercase" />
+              <button class="btn primary big" id="btn-party-join">Join ➜</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LOBBY ============ -->
+    <section class="screen" id="screen-lobby" hidden>
+      <div class="lobby-wrap">
+        <div class="setup-card">
+          <button class="icon-btn lobby-leave" id="btn-lobby-leave" title="Leave room" aria-label="Leave room">✕</button>
+          <div class="lobby-head">
+            <h2>Room code</h2>
+            <button class="code-big" id="btn-copy-code" title="Copy invite link">– – – – – –</button>
+            <div class="copy-hint">Share it — friends enter it on the Party screen, or just open the copied link</div>
+          </div>
+          <div class="field">
+            <div class="field-head"><span class="field-title">Players</span><span class="field-hint" id="lobby-count"></span></div>
+            <div class="lp-list" id="lobby-players"></div>
+          </div>
+          <div class="field">
+            <div class="field-head"><span class="field-title">Rules</span></div>
+            <div class="rules-row">
+              <span class="chip small" id="lobby-diff"></span>
+              <span class="chip small ghost" id="lobby-region"></span>
+              <span class="chip small ghost" id="lobby-mode"></span>
+              <span class="chip small ghost" id="lobby-length"></span>
+            </div>
+          </div>
+          <button class="btn primary big wide" id="btn-lobby-start">▶ Start match</button>
+          <div class="lobby-note" id="lobby-note"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RESULT ============ -->
+    <section class="screen" id="screen-result" hidden>
+      <div class="result-card">
+        <div class="result-head">
+          <div class="result-emoji" id="result-emoji">🏅</div>
+          <h2 id="result-title">Game complete!</h2>
+          <div class="rank-note" id="rank-note"></div>
+        </div>
+        <div class="score-hero"><span class="score-num" id="result-score">0</span><span class="score-max" id="result-max"></span></div>
+        <div class="result-grid" id="result-grid"></div>
+        <div class="podium" id="podium" hidden></div>
+        <div class="review" id="review"></div>
+        <div class="result-actions">
+          <button class="btn primary big" id="btn-again">↻ Play again</button>
+          <button class="btn ghost big" id="btn-change">⚙ Change settings</button>
+          <button class="btn ghost big" id="btn-share">📋 Share</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Leaderboard modal -->
+  <div class="overlay" id="lb-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Leaderboard">
+      <div class="modal-head">
+        <h3>🏆 Top players</h3>
+        <button class="icon-btn" id="lb-close" aria-label="Close">✕</button>
+      </div>
+      <div class="chips filter" id="lb-filters"></div>
+      <div class="lb-list" id="lb-list"></div>
+    </div>
+  </div>
+
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <div id="toast-wrap" aria-live="polite"></div>
+  <div id="screen-fallback" hidden></div>
+</body>
+</html>

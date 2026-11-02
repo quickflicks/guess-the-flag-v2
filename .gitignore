@@ -1,0 +1,11 @@
+# dependencies
+node_modules/
+
+# logs & editor cruft
+*.log
+.DS_Store
+Thumbs.db
+
+# env / secrets
+.env
+.env.*

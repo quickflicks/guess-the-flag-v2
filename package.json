@@ -1,0 +1,17 @@
+{
+  "name": "flagquest",
+  "version": "1.0.0",
+  "description": "Full-stack guess-the-flag game with difficulties, regions, modes, streaks, hints and a leaderboard.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "validate": "node utils/validate.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
