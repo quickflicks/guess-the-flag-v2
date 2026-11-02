@@ -13,6 +13,12 @@ npm start          # → http://localhost:3000
 
 Windows shortcut: double-click **`start.bat`** (launches the server and opens your browser).
 
+### ☁️ One-click deploy on Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/quickflicks/guess-the-flag-v2)
+
+Uses the included `render.yaml` blueprint (Node runtime, `npm start`, health check `/api/config`). Note: on Render's free plan the service sleeps after ~15 minutes idle and its file-backed leaderboard/stats reset when the instance reboots.
+
 Flags are loaded from the free CDN [flagcdn.com](https://flagcdn.com) — an internet connection is required for flag images.
 
 ## Features
